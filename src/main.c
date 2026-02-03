@@ -1,50 +1,29 @@
-#define F_CPU 4000000UL
-#define BAUD_RATE 115200
-
-// Calculate Baud Register
-#define USART0_BAUD_VAL ((float)(4.0 * F_CPU / (BAUD_RATE)) + 0.5)
-
 #include <avr/io.h>
+#include <avr/interrupt.h>
 #include <util/delay.h>
-#include <stdio.h>
 
-void USART0_init(void) {
-    PORTA.DIR |= PIN0_bm;       // TX Output
-    PORTA.DIR &= ~PIN1_bm;      // RX Input
-    USART0.BAUD = (uint16_t)USART0_BAUD_VAL;
-    USART0.CTRLB |= USART_TXEN_bm | USART_RXEN_bm;
-}
+// Include the MCC generated system
+#include "../lib/mcc_generated/system/system.h"
+#include "../lib/mcc_generated/usb/usb_device.h"
 
-void LED_init(void) {
-    PORTA.DIR |= PIN7_bm;
-}
+int main(void)
+{
+    // 1. Initialize Clock (24MHz) and Pins
+    SYSTEM_Initialize();
 
-void USART0_sendChar(const char c) {
-    while (!(USART0.STATUS & USART_DREIF_bm)) {}
-    USART0.TXDATAL = c;
-}
+    // 2. Initialize USB Stack
+    USB_Device_Initialize();
 
-int USART0_printChar(const char c, FILE *stream) {
-    USART0_sendChar(c);
-    return 0;
-}
+    // 3. Enable Global Interrupts (Mandatory for USB)
+    sei();
 
-int main(void) {
-    USART0_init();
-    LED_init();
-
-    FILE USART_stream = FDEV_SETUP_STREAM(USART0_printChar, NULL, _FDEV_SETUP_WRITE);
-    stdout = &USART_stream;
-
-    uint16_t count = 0;
-
-    while (1) {
-        printf("Counter: %d\n", count++);
-
-        PORTA.OUT |= PIN7_bm;
-        _delay_ms(500);
-
-        PORTA.OUT &= ~PIN7_bm;
-        _delay_ms(500);
+    while(1)
+    {
+        // Simple status check
+        if (USB_Device_GetState() == USB_STATE_CONFIGURED) {
+            // Success! The host has enumerated us.
+            // Your scroll wheel logic goes here.
+        }
     }
+    return 0;
 }

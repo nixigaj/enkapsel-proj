@@ -32,6 +32,8 @@
 
 #include <stddef.h>
 #include "../usb0.h"
+
+#include "xc.h"
 #include "../../system/syscfg.h"
 #include "../../system/utils/compiler.h"
 

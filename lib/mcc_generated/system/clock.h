@@ -57,7 +57,7 @@ void CLOCK_Initialize(void);
  * @param CLKCTRL_CFDSRC_t cfd_source - main clock source for CFD 
  * @return None.
  */
-void CFD_Enable(CLKCTRL_CFDSRC_t cfd_source);
+// void CFD_Enable(CLKCTRL_CFDSRC_t cfd_source); Not needed
 
 /**
  * @ingroup clkctrl
@@ -65,6 +65,7 @@ void CFD_Enable(CLKCTRL_CFDSRC_t cfd_source);
  * @param None. 
  * @return None.
  */
-void CFD_Disable(void);
+// void CFD_Disable(void); Not needed
+
 
 #endif // CLOCK_H

@@ -40,6 +40,8 @@ SOFTWARE.
 #include <usb_peripheral_avr_du.h>
 #include <usb_protocol_headers.h>
 
+#include <xc.h>
+
 STATIC USB_CONTROL_TRANSFER_t controlTransfer __attribute__((aligned(2))) = { .transferDataPtr = controlTransfer.buffer };
 
 bool USB_SetupIsReceived(void)

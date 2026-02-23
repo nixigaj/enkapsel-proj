@@ -1,0 +1,17 @@
+{
+  "build": {
+    "f_cpu": "24000000L",
+    "mcu": "avr32du28"
+  },
+  "hardware": {
+    "oscillator": "internal"
+  },
+  "name": "Microchip AVR32DU28",
+  "upload": {
+    "maximum_ram_size": 4096,
+    "maximum_size": 32768,
+    "protocol": "custom"
+  },
+  "url": "https://www.microchip.com/en-us/product/avr32du28",
+  "vendor": "Microchip"
+}

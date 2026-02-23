@@ -1,16 +1,14 @@
 
 /**
- * CLKCTRL Generated Driver API Header File
+ * SYSCFG Generated Driver File
+ * 
+ * @file syscfg.c
+ * 
+ * @ingroup syscfg
+ * 
+ * @brief This is the generated driver implementation file for the SYSCFG driver.
  *
- * @file clkctrl.h
- *
- * @defgroup clkctrl CLKCTRL
- *
- * @brief This header file provides APIs for the CLKCTRL driver.
- *
- * @version CLKCTRL Driver Version 1.1.4
- *
- * @version Package Version 2.0.10
+ * @version SYSCFG Driver Version 1.0.0
 */
 /*
 © [2026] Microchip Technology Inc. and its subsidiaries.
@@ -33,39 +31,34 @@
     THIS SOFTWARE.
 */
 
+/**
+  Section: Included Files
+*/
 
-#ifndef CLOCK_H
-#define CLOCK_H
-
-#ifndef F_CPU
-#define F_CPU 24000000UL
-#endif
-
-#include "ccp.h"
+#include "../../system/utils/compiler.h"
+#include "../syscfg.h"
 
 /**
- * @ingroup clkctrl
- * @brief Initializes the CLKCTRL module.
- * @param None.
- * @return None.
- */
-void CLOCK_Initialize(void);
+  Section: SYSCFG APIs
+*/
+
+void SYSCFG_Initialize(void)
+{
+  SYSCFG.VUSBCTRL = (0 << SYSCFG_USBVREG_bp);  // USBVREG DISABLE;  
+}
+uint8_t SYSCFG_GetRevId(void)
+{
+  return SYSCFG.REVID;
+}
+inline void SYSCFG_UsbVregEnable(void)
+{
+  SYSCFG.VUSBCTRL = SYSCFG_USBVREG_bm;
+}
+inline void SYSCFG_UsbVregDisable(void)
+{
+  SYSCFG.VUSBCTRL = ~SYSCFG_USBVREG_bm;
+}
 
 /**
- * @ingroup clkctrl
- * @brief Enables the Clock Failure Detection on the main clock.
- * @param CLKCTRL_CFDSRC_t cfd_source - main clock source for CFD 
- * @return None.
- */
-// void CFD_Enable(CLKCTRL_CFDSRC_t cfd_source); Not needed
-
-/**
- * @ingroup clkctrl
- * @brief Disables the Clock Failure Detection on the main clock.
- * @param None. 
- * @return None.
- */
-// void CFD_Disable(void); Not needed
-
-
-#endif // CLOCK_H
+ End of File
+*/

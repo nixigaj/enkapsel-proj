@@ -1,17 +1,19 @@
-/**
- * Interrupt Manager Generated Driver API Header File.
- * 
- * @file interrupt.h
- * 
- * @defgroup interrupt INTERRUPT
- * 
- * @brief This file contains the API prototype for the Interrupt Manager.
- *
- * @version Interrupt Manager Driver Version 1.0.0
-*/
 
+/**
+ * CLKCTRL Generated Driver API Header File
+ *
+ * @file clkctrl.h
+ *
+ * @defgroup clkctrl CLKCTRL
+ *
+ * @brief This header file provides APIs for the CLKCTRL driver.
+ *
+ * @version CLKCTRL Driver Version 1.1.4
+ *
+ * @version Package Version 2.0.10
+*/
 /*
-Â© [2026] Microchip Technology Inc. and its subsidiaries.
+© [2026] Microchip Technology Inc. and its subsidiaries.
 
     Subject to your compliance with these terms, you may use Microchip 
     software and any derivatives exclusively with Microchip products. 
@@ -32,26 +34,37 @@
 */
 
 
-#ifndef INTERRUPT_H
-#define INTERRUPT_H
+#ifndef CLOCK_H
+#define CLOCK_H
 
-#include "../system/utils/compiler.h"
-#include "ccp.h"
-#include "../system/utils/atomic.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif 
-
-/**
- * @ingroup interrupt
- * @brief Initializes the Interrupt module.
- * @retval 0 - Initialization is successful.
- */
-int8_t CPUINT_Initialize();
-
-#ifdef __cplusplus
-}
+#ifndef F_CPU
+#define F_CPU 24000000UL
 #endif
 
-#endif /* INTERRUPT_H */
+#include "ccp.h"
+
+/**
+ * @ingroup clkctrl
+ * @brief Initializes the CLKCTRL module.
+ * @param None.
+ * @return None.
+ */
+void CLOCK_Initialize(void);
+
+/**
+ * @ingroup clkctrl
+ * @brief Enables the Clock Failure Detection on the main clock.
+ * @param CLKCTRL_CFDSRC_t cfd_source - main clock source for CFD 
+ * @return None.
+ */
+void CFD_Enable(CLKCTRL_CFDSRC_t cfd_source);
+
+/**
+ * @ingroup clkctrl
+ * @brief Disables the Clock Failure Detection on the main clock.
+ * @param None. 
+ * @return None.
+ */
+void CFD_Disable(void);
+
+#endif // CLOCK_H

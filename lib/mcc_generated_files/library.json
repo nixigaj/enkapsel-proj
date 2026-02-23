@@ -1,0 +1,18 @@
+{
+  "name": "mcc_generated_files",
+  "version": "1.0.0",
+  "build": {
+    "flags": [
+      "-I system",
+      "-I system/utils",
+      "-I usb",
+      "-I usb/usb_common",
+      "-I usb/usb_hid",
+      "-I usb/usb_peripheral"
+    ],
+    "srcFilter": [
+      "+<**/*.c>",
+      "+<**/*.S>"
+    ]
+  }
+}

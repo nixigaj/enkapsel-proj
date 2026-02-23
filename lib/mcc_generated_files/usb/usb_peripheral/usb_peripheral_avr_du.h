@@ -40,7 +40,6 @@
     #include <xc.h>
 #else // avr-gcc
     #include <avr/io.h>
-    #include <xc.h>
 #endif
 
 #include <usb_config.h>
@@ -53,23 +52,21 @@
  */
 #define ALWAYS_INLINE __attribute__((always_inline)) inline
 
-// /**
-//  * @ingroup usb_peripheral_avr_du
-//  * @struct USB_ENDPOINT_TABLE_struct
-//  * @brief Represents the endpoint configuration table based on the number of endpoints in use.
-//  * The table data structure is defined by USB_EP_TABLE_struct in the device header file,
-//  * modified to support configuration of size from USB_EP_NUM.
-//  */
-//
-// typedef struct USB_ENDPOINT_TABLE_struct
-// {
-//     register8_t FIFO[USB_EP_NUM * 2u]; /**<FIFO Entry*/
-//     USB_EP_PAIR_t EP[USB_EP_NUM];      /**<USB Endpoint Register Pairs*/
-//     register16_t FRAMENUM;             /**<Frame Number*/
-// } USB_ENDPOINT_TABLE_t;
-//
-// extern USB_ENDPOINT_TABLE_t endpointTable;
+/**
+ * @ingroup usb_peripheral_avr_du
+ * @struct USB_ENDPOINT_TABLE_struct
+ * @brief Represents the endpoint configuration table based on the number of endpoints in use.
+ * The table data structure is defined by USB_EP_TABLE_struct in the device header file,
+ * modified to support configuration of size from USB_EP_NUM.
+ */
+typedef struct USB_ENDPOINT_TABLE_struct
+{
+    register8_t FIFO[USB_EP_NUM * 2u]; /**<FIFO Entry*/
+    USB_EP_PAIR_t EP[USB_EP_NUM];      /**<USB Endpoint Register Pairs*/
+    register16_t FRAMENUM;             /**<Frame Number*/
+} USB_ENDPOINT_TABLE_t;
 
+extern USB_ENDPOINT_TABLE_t endpointTable;
 
 /**
  * @ingroup usb_peripheral_avr_du

@@ -75,22 +75,26 @@ int main(void) {
 
             if (status == SUCCESS)
             {
-                // Trace a square: 1 second (1000 ticks) per side
-                if (tick_counter < 1000)
+                // Send scroll update every 8ms (125Hz) - Perfect for 120Hz screens
+                if (tick_counter % 16 == 0)
                 {
-                    USB_HIDTouchpadScroll(5, 0);   // Right
-                }
-                else if (tick_counter < 2000)
-                {
-                    USB_HIDTouchpadScroll(0, 5);   // Down
-                }
-                else if (tick_counter < 3000)
-                {
-                    USB_HIDTouchpadScroll(-5, 0);  // Left
-                }
-                else if (tick_counter < 4000)
-                {
-                    USB_HIDTouchpadScroll(0, -5);  // Up
+                    // Trace a square: 1 second (1000 ticks) per side
+                    if (tick_counter < 1000)
+                    {
+                        USB_HIDTouchpadScroll(40, 0);   // Right
+                    }
+                    else if (tick_counter < 2000)
+                    {
+                        USB_HIDTouchpadScroll(0, 40);   // Down
+                    }
+                    else if (tick_counter < 3000)
+                    {
+                        USB_HIDTouchpadScroll(-40, 0);  // Left
+                    }
+                    else if (tick_counter < 4000)
+                    {
+                        USB_HIDTouchpadScroll(0, -40);  // Up
+                    }
                 }
 
                 // Increment counter and reset after 4 seconds (4000 ticks)

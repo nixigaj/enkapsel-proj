@@ -34,35 +34,83 @@
 #include "usb_descriptors.h"
 #include <usb_protocol_headers.h>
 
-//Report descriptor for a standard mouse with three buttons and no scroll wheel
+// Report descriptor for a High-Resolution Smooth Scroll Mouse
 USB_HID_REPORT_DESCRIPTOR_t USB_HIDMouseReportDescriptor = {
     {
-        0x05, 0x01, /* Usage Page (Generic Desktop),       */
-        0x09, 0x02, /* Usage (Mouse),                      */
-        0xA1, 0x01, /*  Collection (Application),          */
-        0x09, 0x01, /*   Usage (Pointer),                  */
-        0xA1, 0x00, /*  Collection (Physical),             */
-        0x05, 0x09, /*     Usage Page (Buttons),           */
-        0x19, 0x01, /*     Usage Minimum (01),             */
-        0x29, 0x03, /*     Usage Maximum (03),             */
-        0x15, 0x00, /*     Logical Minimum (0),            */
-        0x25, 0x01, /*     Logical Maximum (1),            */
-        0x75, 0x01, /*     Report Size (1),                */
-        0x95, 0x03, /*     Report Count (3),               */
-        0x81, 0x02, /*     Input (Data, Variable, Absolute) */
-        0x75, 0x05, /*     Report Size (5),                */
-        0x95, 0x01, /*     Report Count (1),               */
-        0x81, 0x01, /*     Input (Constant),               */
-        0x05, 0x01, /*     Usage Page (Generic Desktop),   */
-        0x09, 0x30, /*     Usage (X),                      */
-        0x09, 0x31, /*     Usage (Y),                      */
-        0x15, 0x81, /*     Logical Minimum (-127),         */
-        0x25, 0x7F, /*     Logical Maximum (127),          */
-        0x75, 0x08, /*     Report Size (8),                */
-        0x95, 0x02, /*     Report Count (2),               */
-        0x81, 0x06, /*     Input (Data, Variable, Relative) */
-        0xC0, /*  End Collection,                    */
-        0xC0, /* End Collection                      */
+        0x05, 0x0D, /* Usage Page (Digitizers) */
+        0x09, 0x05, /* Usage (Touch Pad) */
+        0xA1, 0x01, /* Collection (Application) */
+        0x85, 0x01, /* Report ID (1) */
+
+        // Finger 1
+        0x05, 0x0D, /* Usage Page (Digitizers) */
+        0x09, 0x22, /* Usage (Finger) */
+        0xA1, 0x02, /* Collection (Logical) */
+        0x09, 0x42, /* Usage (Tip Switch) */
+        0x15, 0x00, /* Logical Minimum (0) */
+        0x25, 0x01, /* Logical Maximum (1) */
+        0x75, 0x01, /* Report Size (1) */
+        0x95, 0x01, /* Report Count (1) */
+        0x81, 0x02, /* Input (Data, Variable, Absolute) */
+        0x09, 0x51, /* Usage (Contact Identifier) */
+        0x75, 0x07, /* Report Size (7) */
+        0x95, 0x01, /* Report Count (1) */
+        0x25, 0x7F, /* Logical Maximum (127) */
+        0x81, 0x02, /* Input (Data, Variable, Absolute) */
+        0x05, 0x01, /* Usage Page (Generic Desktop) */
+        0x09, 0x30, /* Usage (X) */
+        0x09, 0x31, /* Usage (Y) */
+        0x15, 0x00, /* Logical Minimum (0) */
+        0x26, 0xFF, 0x0F, /* Logical Maximum (4095) */
+        0x75, 0x10, /* Report Size (16) */
+        0x95, 0x02, /* Report Count (2) */
+        0x81, 0x02, /* Input (Data, Variable, Absolute) */
+        0xC0,       /* End Collection */
+
+        // Finger 2
+        0x05, 0x0D, /* Usage Page (Digitizers) */
+        0x09, 0x22, /* Usage (Finger) */
+        0xA1, 0x02, /* Collection (Logical) */
+        0x09, 0x42, /* Usage (Tip Switch) */
+        0x15, 0x00, /* Logical Minimum (0) */
+        0x25, 0x01, /* Logical Maximum (1) */
+        0x75, 0x01, /* Report Size (1) */
+        0x95, 0x01, /* Report Count (1) */
+        0x81, 0x02, /* Input (Data, Variable, Absolute) */
+        0x09, 0x51, /* Usage (Contact Identifier) */
+        0x75, 0x07, /* Report Size (7) */
+        0x95, 0x01, /* Report Count (1) */
+        0x25, 0x7F, /* Logical Maximum (127) */
+        0x81, 0x02, /* Input (Data, Variable, Absolute) */
+        0x05, 0x01, /* Usage Page (Generic Desktop) */
+        0x09, 0x30, /* Usage (X) */
+        0x09, 0x31, /* Usage (Y) */
+        0x15, 0x00, /* Logical Minimum (0) */
+        0x26, 0xFF, 0x0F, /* Logical Maximum (4095) */
+        0x75, 0x10, /* Report Size (16) */
+        0x95, 0x02, /* Report Count (2) */
+        0x81, 0x02, /* Input (Data, Variable, Absolute) */
+        0xC0,       /* End Collection */
+
+        // Contact Count
+        0x05, 0x0D, /* Usage Page (Digitizers) */
+        0x09, 0x54, /* Usage (Contact Count) */
+        0x15, 0x00, /* Logical Minimum (0) */
+        0x25, 0x7F, /* Logical Maximum (127) */
+        0x75, 0x08, /* Report Size (8) */
+        0x95, 0x01, /* Report Count (1) */
+        0x81, 0x02, /* Input (Data, Variable, Absolute) */
+
+        // PTP Configuration (Required for Windows to load the Precision driver)
+        0x85, 0x02, /* Report ID (2) */
+        0x09, 0x55, /* Usage (Contact Count Maximum) */
+        0x15, 0x02, /* Logical Minimum (2) */
+        0x25, 0x02, /* Logical Maximum (2) */
+        0x75, 0x08, /* Report Size (8) */
+        0x95, 0x01, /* Report Count (1) */
+        0xB1, 0x02, /* Feature (Data, Variable, Absolute) */
+
+        0xC0        /* End Collection */
     }
 };
 

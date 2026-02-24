@@ -153,9 +153,21 @@ typedef struct
  */
 typedef struct
 {
-    uint8_t Button; /**< Button mask for currently pressed buttons in the mouse*/
-    int8_t X;       /**< Current delta X movement of the mouse*/
-    int8_t Y;       /**< Current delta Y movement of the mouse*/
+    uint8_t reportId;       // Always 1 for Touch Input
+
+    // Finger 1
+    uint8_t tipSwitch1 : 1; // Is finger touching?
+    uint8_t contactId1 : 7; // Tracking ID
+    uint16_t x1;            // Absolute X
+    uint16_t y1;            // Absolute Y
+
+    // Finger 2
+    uint8_t tipSwitch2 : 1;
+    uint8_t contactId2 : 7;
+    uint16_t x2;
+    uint16_t y2;
+
+    uint8_t contactCount;   // Total fingers touching
 } USB_MOUSE_REPORT_DATA_t;
 
 /**

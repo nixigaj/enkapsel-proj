@@ -35,16 +35,23 @@ int USART0_printChar(const char c, FILE *stream) {
 
 FILE USART_stream = FDEV_SETUP_STREAM(USART0_printChar, NULL, _FDEV_SETUP_WRITE);
 
+// --- Hardware Timer Initialization ---
+void TIMER_init(void) {
+    // TCB0 at 24MHz. 24,000 ticks = 1ms (1000Hz)
+    TCB0.CCMP = 24000;
+    TCB0.CTRLA = TCB_CLKSEL_DIV1_gc | TCB_ENABLE_bm;
+}
+
 #define SYSCFG_VUSBCTRL_ADDR 0x0F0A
 
-int main(void)
-{
+int main(void) {
     CLOCK_init();
     USART0_init();
+    TIMER_init(); // Initialize our 1ms timer
     stdout = &USART_stream;
 
-    _delay_ms(500);
-    printf("\n--- AVR32DU28 BASIC MOUSE ---\n");
+    _delay_ms(800);
+    printf("\n--- AVR32DU28 1000Hz SCROLLER (SQUARE PATTERN) ---\n");
 
     printf("Enabling VUSB Regulator...\n");
     *(volatile uint8_t *)(SYSCFG_VUSBCTRL_ADDR) = 0x01;
@@ -55,29 +62,43 @@ int main(void)
 
     printf("Waiting for PC to see us...\n");
 
-    uint8_t lastState = 255;
-    uint32_t counter = 0;
-
+    uint16_t tick_counter = 0;
     while(1)
     {
         USBDevice_Handle();
-
         RETURN_CODE_t status = USBDevice_StatusGet();
 
-        if (status != lastState) {
-            printf("Status Changed: %d\n", status);
-            lastState = status;
-        }
-
-        if (status == SUCCESS)
+        // 1000Hz Hardware Timer Tick (Executes once every 1ms)
+        if (TCB0.INTFLAGS & TCB_CAPT_bm)
         {
-            counter++;
-            if (counter > 400) {
-                printf("Jiggle!\n");
-                USB_HIDMouseMove(5, 0);
-                _delay_ms(1);
-                USB_HIDMouseMove(-5, 0);
-                counter = 0;
+            TCB0.INTFLAGS = TCB_CAPT_bm; // Clear flag
+
+            if (status == SUCCESS)
+            {
+                // Trace a square: 1 second (1000 ticks) per side
+                if (tick_counter < 1000)
+                {
+                    USB_HIDTouchpadScroll(5, 0);   // Right
+                }
+                else if (tick_counter < 2000)
+                {
+                    USB_HIDTouchpadScroll(0, 5);   // Down
+                }
+                else if (tick_counter < 3000)
+                {
+                    USB_HIDTouchpadScroll(-5, 0);  // Left
+                }
+                else if (tick_counter < 4000)
+                {
+                    USB_HIDTouchpadScroll(0, -5);  // Up
+                }
+
+                // Increment counter and reset after 4 seconds (4000 ticks)
+                tick_counter++;
+                if (tick_counter >= 4000)
+                {
+                    tick_counter = 0;
+                }
             }
         }
     }

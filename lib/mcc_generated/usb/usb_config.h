@@ -91,7 +91,7 @@
  * @def USB_HID_REPORT_DESCRIPTOR_SIZE
  * @brief Macro for the Human Interface Devices (HID) report descriptor size
  */
-#define USB_HID_REPORT_DESCRIPTOR_SIZE 50U
+#define USB_HID_REPORT_DESCRIPTOR_SIZE 129U
 
 /**
  * @ingroup usb_device_stack

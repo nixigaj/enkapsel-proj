@@ -43,7 +43,7 @@
  * @def USB_HID_MOUSE_REPORT_SIZE
  * @brief Size of the report for a standard HID mouse.
  */
-#define USB_HID_MOUSE_REPORT_SIZE 8
+#define USB_HID_MOUSE_REPORT_SIZE 12
 
 /**
  * @ingroup usb_hid_mouse
@@ -74,47 +74,8 @@
  */
 void USB_HIDMouseInitialize(USB_HID_REPORT_DESCRIPTOR_t *reportPtr);
 
-/**
- * @ingroup usb_hid_mouse
- * @brief Registers mouse movement and sends its coordinates to the host.
- * @param x_position - Relative position in X direction
- * @param y_position - Relative position in Y direction
- * @return SUCCESS or an Error code according to RETURN_CODE_t
- */
-RETURN_CODE_t USB_HIDMouseMove(int8_t x_position, int8_t y_position);
-
-/**
- * @ingroup usb_hid_mouse
- * @brief Registers the button and its state and sends it to the host.
- * @param buttonState - Boolean value indicating if the button is pressed or not
- * @param button - Parameter for which button is pressed
- * @return SUCCESS or an Error code according to RETURN_CODE_t
- */
-RETURN_CODE_t USB_HIDMouseButton(bool buttonState, uint8_t button);
-
-/**
- * @ingroup usb_hid_mouse
- * @brief Registers the button state of the left button.
- * @param buttonState - Boolean value indicating if the button is pressed or not
- * @return SUCCESS or an Error code according to RETURN_CODE_t
- */
-RETURN_CODE_t USB_HIDMouseButtonLeft(bool buttonState);
-
-/**
- * @ingroup usb_hid_mouse
- * @brief Registers the button state of the right button.
- * @param buttonState - Boolean value indicating if the button is pressed or not
- * @return SUCCESS or an Error code according to RETURN_CODE_t
- */
-RETURN_CODE_t USB_HIDMouseButtonRight(bool buttonState);
-
-/**
- * @ingroup usb_hid_mouse
- * @brief Registers the button state of the middle button.
- * @param buttonState - Boolean value indicating if the button is pressed or not
- * @return SUCCESS or an Error code according to RETURN_CODE_t
- */
-RETURN_CODE_t USB_HIDMouseButtonMiddle(bool buttonState);
+// Custom scroll function
+RETURN_CODE_t USB_HIDTouchpadScroll(int16_t dx, int16_t dy);
 
 /**
  * @}

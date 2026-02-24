@@ -31,6 +31,7 @@
 
 #include <usb_hid_mouse.h>
 #include <stddef.h>
+#include <string.h>
 #include <usb_common_elements.h>
 #include <usb_hid.h>
 #include <usb_hid_transfer.h>
@@ -44,71 +45,55 @@ STATIC USB_MOUSE_REPORT_DATA_t mouseInputReport;
 
 void USB_HIDMouseInitialize(USB_HID_REPORT_DESCRIPTOR_t *reportPtr)
 {
-    // Initialize idle rate and protocol
     usbHIDMouseRate = 0;
     usbHIDMouseProtocol = 0;
-    // Clear input report
-    mouseInputReport.Button = 0;
-    mouseInputReport.X = 0;
-    mouseInputReport.Y = 0;
-    // Register Rate, Protocol and Report Descriptor pointers
+
+    // Wipe the entire 12-byte struct clean on startup
+    memset(&mouseInputReport, 0, sizeof(USB_MOUSE_REPORT_DATA_t));
+
     USB_HIDInitialize(&usbHIDMouseRate, &usbHIDMouseProtocol, reportPtr);
 };
 
-RETURN_CODE_t USB_HIDMouseMove(int8_t x_position, int8_t y_position)
+// Custom scroll function
+static uint16_t ptp_center_x = 2048;
+static uint16_t ptp_center_y = 2048;
+
+RETURN_CODE_t USB_HIDTouchpadScroll(int16_t dx, int16_t dy)
 {
-    RETURN_CODE_t status = UNINITIALIZED;
+    // If our fake fingers approach the edge of the 4095x4095 surface, lift and reset
+    if (ptp_center_x < 500 || ptp_center_x > 3500 ||
+        ptp_center_y < 500 || ptp_center_y > 3500)
+    {
+        mouseInputReport.reportId = 1;
+        mouseInputReport.tipSwitch1 = 0; // Lift finger 1
+        mouseInputReport.tipSwitch2 = 0; // Lift finger 2
+        mouseInputReport.contactCount = 0;
 
-    // Add position in HID mouse report
-    if ((-127 > x_position) || (127 < x_position))
-    {
-        status = UNSUPPORTED; // Overflow of report
-    }
-    else if ((-127 > y_position) || (127 < y_position))
-    {
-        status = UNSUPPORTED; // Overflow of report
-    }
-    else
-    {
-        mouseInputReport.X = x_position;
-        mouseInputReport.Y = y_position;
+        // Reset to center
+        ptp_center_x = 2048;
+        ptp_center_y = 2048;
 
-        // Valid and send report
-        status = USB_HIDMouseReportInSend(&mouseInputReport);
-    }
-
-    return status;
-}
-
-RETURN_CODE_t USB_HIDMouseButton(bool buttonState, uint8_t button)
-{
-    RETURN_CODE_t status = UNINITIALIZED;
-    // Modify buttons report
-    if (HID_MOUSE_BUTTON_DOWN == buttonState)
-    {
-        mouseInputReport.Button |= button;
-        status = USB_HIDMouseReportInSend(&mouseInputReport);
-    }
-    else
-    {
-        mouseInputReport.Button &= ~button;
-        status = USB_HIDMouseReportInSend(&mouseInputReport);
+        return USB_HIDMouseReportInSend(&mouseInputReport);
     }
 
-    return status;
-}
+    // Move the fake fingers
+    ptp_center_x += dx;
+    ptp_center_y += dy;
 
-RETURN_CODE_t USB_HIDMouseButtonLeft(bool buttonState)
-{
-    return USB_HIDMouseButton(buttonState, HID_MOUSE_LEFT_BUTTON);
-}
+    mouseInputReport.reportId = 1;
+    mouseInputReport.contactCount = 2; // Two fingers = scroll
 
-RETURN_CODE_t USB_HIDMouseButtonRight(bool buttonState)
-{
-    return USB_HIDMouseButton(buttonState, HID_MOUSE_RIGHT_BUTTON);
-}
+    // Finger 1
+    mouseInputReport.tipSwitch1 = 1;
+    mouseInputReport.contactId1 = 0;
+    mouseInputReport.x1 = ptp_center_x;
+    mouseInputReport.y1 = ptp_center_y;
 
-RETURN_CODE_t USB_HIDMouseButtonMiddle(bool buttonState)
-{
-    return USB_HIDMouseButton(buttonState, HID_MOUSE_MIDDLE_BUTTON);
+    // Finger 2 (Placed 500 units horizontally away from Finger 1)
+    mouseInputReport.tipSwitch2 = 1;
+    mouseInputReport.contactId2 = 1;
+    mouseInputReport.x2 = ptp_center_x + 500;
+    mouseInputReport.y2 = ptp_center_y;
+
+    return USB_HIDMouseReportInSend(&mouseInputReport);
 }

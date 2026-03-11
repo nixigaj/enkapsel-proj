@@ -6,25 +6,19 @@
 #include <avr/interrupt.h>
 #include <util/delay.h>
 #include <stdio.h>
-#include <stdlib.h> // For abs()
+#include <stdlib.h>
 
-// Include headers from your setup
+
 #include "ccp.h"
-#include "system/system.h"
 #include "usb_device.h"
 #include "usb_common_elements.h"
 
-// --- AS5600 I2C Defines ---
 #define AS5600_I2C_ADDR_W  0x6C  // 0x36 << 1 (Write Address)
 #define AS5600_I2C_ADDR_R  0x6D  // (0x36 << 1) | 1 (Read Address)
 #define AS5600_RAW_ANGLE_H 0x0C  // High byte register of raw angle
 
 // --- Scroll Tuning Parameters ---
-// Increase this to require more physical turning per scroll "tick"
-// Decrease it to make the scroll wheel more sensitive
 #define SCROLL_SENSITIVITY 2
-
-// NEW: Increase this to make the page scroll faster per tick
 #define SCROLL_MULTIPLIER 5
 
 void CLOCK_init(void) {
@@ -51,12 +45,11 @@ int USART0_printChar(const char c, FILE *stream) {
 
 FILE USART_stream = FDEV_SETUP_STREAM(USART0_printChar, NULL, _FDEV_SETUP_WRITE);
 
-// Led initialization
 void LED_init(void) {
     PORTA.DIR |= PIN7_bm;
 }
 
-// --- TWI (I2C) Initialization ---
+// I2C init
 void TWI0_init(void) {
     PORTA.PIN2CTRL = PORT_PULLUPEN_bm;
     PORTA.PIN3CTRL = PORT_PULLUPEN_bm;
@@ -66,7 +59,6 @@ void TWI0_init(void) {
     TWI0.MSTATUS = TWI_BUSSTATE_IDLE_gc;
 }
 
-// --- AS5600 Read Function ---
 uint16_t AS5600_readAngle(void) {
     uint8_t high_byte, low_byte;
 
@@ -89,7 +81,7 @@ uint16_t AS5600_readAngle(void) {
     return ((uint16_t)(high_byte & 0x0F) << 8) | low_byte;
 }
 
-// --- Hardware Timer Initialization ---
+// Hardware timer init
 void TIMER_init(void) {
     // TCB0 at 24MHz. 24,000 ticks = 1ms (1000Hz)
     TCB0.CCMP = 24000;
@@ -118,7 +110,7 @@ int main(void) {
 
     printf("Waiting for PC to recognize device...\n");
 
-    // Variables for tracking rotation
+    // Rotation tracking
     int16_t previous_angle = (int16_t)AS5600_readAngle();
     int16_t angle_accumulator = 0;
     uint16_t print_divider = 0;
@@ -127,41 +119,35 @@ int main(void) {
         USBDevice_Handle();
         RETURN_CODE_t status = USBDevice_StatusGet();
 
-        // 1000Hz Hardware Timer Tick (Executes once every 1ms)
+        // 1000Hz hardware tick
         if (TCB0.INTFLAGS & TCB_CAPT_bm) {
-            TCB0.INTFLAGS = TCB_CAPT_bm; // Clear flag
+            TCB0.INTFLAGS = TCB_CAPT_bm;
 
             if (status == SUCCESS) {
-                // 1. Read current angle
                 int16_t current_angle = (int16_t)AS5600_readAngle();
 
-                // 2. Calculate the difference
                 int16_t diff = current_angle - previous_angle;
 
-                // 3. Handle wrap-around (crossing the 0 / 4095 boundary)
+                // Wrap around
                 if (diff > 2048) {
-                    diff -= 4096; // Turned backwards past 0
+                    diff -= 4096;
                 } else if (diff < -2048) {
-                    diff += 4096; // Turned forwards past 4095
+                    diff += 4096;
                 }
 
-                // 4. Add difference to our accumulator (filters noise)
+                // Add to accumulator for hysteresis and noise filtering
                 angle_accumulator += diff;
 
-                // 5. Check if we have turned enough to trigger a scroll
                 if (abs(angle_accumulator) >= SCROLL_SENSITIVITY) {
-                    // Determine how many scroll 'clicks' to calculate
                     int8_t scroll_steps = angle_accumulator / SCROLL_SENSITIVITY;
 
-                    // Keep the remainder in the accumulator so we don't lose precision
+                    // Keep remainder in accumulator
                     angle_accumulator %= SCROLL_SENSITIVITY;
 
-                    // Apply the multiplier right before sending to the PC
                     int8_t final_scroll = scroll_steps * SCROLL_MULTIPLIER;
 
-                    PORTA.OUT |= PIN7_bm;
+                    PORTA.OUT |= PIN7_bm; // Indicator led on
 
-                    // Send the scroll command. (0, y) corresponds to vertical scrolling.
                     USB_HIDTouchpadScroll(0, final_scroll);
                 } else {
                     PORTA.OUT &= ~PIN7_bm;
@@ -169,7 +155,7 @@ int main(void) {
 
                 previous_angle = current_angle;
 
-                // Optional: Print status every 100ms for debugging via UART
+                // UART Debug
                 if (++print_divider >= 100) {
                     print_divider = 0;
                     printf("Raw: %4d | Accumulator: %4d\n", current_angle, angle_accumulator);
